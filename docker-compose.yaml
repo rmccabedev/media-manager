@@ -1,0 +1,66 @@
+services:
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    restart: unless-stopped
+    container_name: sonarr
+    environment:
+      - PUID=501
+      - PGID=501
+      - TZ=Europe/Dublin
+    volumes:
+      - config/sonarr:/config
+      - downloads/shows:/tv #optional
+      - downloads/torrents:/downloads #optional
+    ports:
+      - 8989:8989
+    depends_on:
+      - deluge
+      - jackett
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    restart: unless-stopped
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Dublin
+    volumes:
+      - config/radarr:/config
+      - downloads/movies:/movies #optional
+      - downloads/torrents:/downloads #optional
+    ports:
+      - 7878:7878
+    depends_on:
+      - deluge
+      - jackett
+
+  deluge:
+    image: lscr.io/linuxserver/deluge
+    restart: unless-stopped
+    environment:
+      - PUID=501
+      - PGID=501
+      - TZ=Europe/Dublin
+    volumes:
+      - config/deluge:/config
+      - downloads/torrents:/data/torrents
+    ports:
+      - 8112:8112
+      - 6881:6881
+      - 6881:6881/udp
+
+  jackett:
+    image: lscr.io/linuxserver/jackett
+    restart: unless-stopped
+    environment:
+      - PUID=501
+      - PGID=501
+      - TZ=Europe/Dublin
+      - AUTO_UPDATE=true
+    volumes:
+      - config/jackett:/config
+      - downloads/indexing:/downloads
+    ports:
+      - 9117:9117

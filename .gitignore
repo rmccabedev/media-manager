@@ -1,14 +1,8 @@
-config/deluge/*
-config/jackett/*
-config/radarr/*
-config/sabnzbd/*
-config/sonarr/*
-
-downloads/indexing/*
-downloads/movies/*
-downloads/shows/*
-downloads/torrents/*
+config/**
+data/**
 
 .DS_store
 
 checkin.sh
+
+.env

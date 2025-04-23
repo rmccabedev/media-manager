@@ -1,66 +1,75 @@
 services:
-
-  sonarr:
-    image: lscr.io/linuxserver/sonarr
+  emby:
+    image: lscr.io/linuxserver/emby:latest
+    container_name: emby
     restart: unless-stopped
-    container_name: sonarr
-    environment:
-      - PUID=501
-      - PGID=501
-      - TZ=Europe/Dublin
-    volumes:
-      - ./config/sonarr:/config
-      - ./downloads/shows:/tv #optional
-      - ./downloads/torrents:/downloads #optional
     ports:
-      - 8989:8989
-    depends_on:
-      - deluge
-      - jackett
+      - "8096:8096"
+      - "8920:8920" 
+    volumes:
+      - ./config/emby/config:/config
+      - ./data/media:/data/media
+    environment:
+      - EMBY_PublishedServerUrl=http://${IP}:8096  # Optional: Set your server URL
+      - TZ=Europe/Dublin
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
-    restart: unless-stopped
     container_name: radarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Dublin
-    volumes:
-      - ./config/radarr:/config
-      - ./downloads/movies:/movies #optional
-      - ./downloads/torrents:/downloads #optional
+    restart: unless-stopped
     ports:
-      - 7878:7878
-    depends_on:
-      - deluge
-      - jackett
+      - "7878:7878"  # Radarr web interface
+    volumes:
+      - ./config/radarr/config:/config  # Radarr configuration files
+      - ./data:/data
+      - ./data:/downloads
+      - ./data/media/movies:/movies
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"  # Sonarr web interface
+    volumes:
+      - ./config/sonarr/config:/config  # Sonarr configuration files
+      - ./data:/data
+      - ./data/downloads:/downloads
+      - ./data/media/tv:/tv
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+
+  jackett:
+      image: lscr.io/linuxserver/jackett:latest
+      restart: unless-stopped
+      environment:
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TZ=Europe/Dublin
+        - AUTO_UPDATE=true
+      volumes:
+        - ./config/jackett:/config
+        - ./data/indexing-jackett:/downloads
+      ports:
+        - 9117:9117
 
   deluge:
     image: lscr.io/linuxserver/deluge
     restart: unless-stopped
     environment:
-      - PUID=501
-      - PGID=501
+      - PUID=${PUID}
+      - PGID=${PGID}
       - TZ=Europe/Dublin
     volumes:
       - ./config/deluge:/config
-      - ./downloads/torrents:/data/torrents
+      - ./data/torrents:/data/torrents
+      - ./data/indexing:/data/indexing
+      - ./data/downloads:/downloads
     ports:
       - 8112:8112
       - 6881:6881
       - 6881:6881/udp
-
-  jackett:
-    image: lscr.io/linuxserver/jackett
-    restart: unless-stopped
-    environment:
-      - PUID=501
-      - PGID=501
-      - TZ=Europe/Dublin
-      - AUTO_UPDATE=true
-    volumes:
-      - ./config/jackett:/config
-      - ./downloads/indexing:/downloads
-    ports:
-      - 9117:9117

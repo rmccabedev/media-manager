@@ -10,10 +10,13 @@ populate-user-info:
 	sed -i "s/^PGID=.*/PGID=$(id -g)/" .env
 	echo ".env file updated with PUID and PGID."
 
-restart: down up
+restart: down update up
 
 down:
 	docker-compose down
 
 up:
 	docker-compose up -d
+
+update:
+	docker-compose pull

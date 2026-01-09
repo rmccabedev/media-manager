@@ -28,6 +28,10 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+    depends_on:
+      - deluge
+      - flaresolver
+      - jackett
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -41,23 +45,31 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+    depends_on:
+      - deluge
+      - flaresolver
+      - jackett
 
   jackett:
-      image: lscr.io/linuxserver/jackett:latest
-      restart: unless-stopped
-      environment:
-        - PUID=${PUID}
-        - PGID=${PGID}
-        - TZ=Europe/Dublin
-        - AUTO_UPDATE=true
-      volumes:
-        - ./config/jackett:/config
-        - ./data/indexing-jackett:/downloads
-      ports:
-        - 9117:9117
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=Europe/Dublin
+      - AUTO_UPDATE=true
+    volumes:
+      - ./config/jackett:/config
+      - ./data/indexing-jackett:/downloads
+    ports:
+      - 9117:9117
+    depends_on:
+      - flaresolver
 
   deluge:
     image: lscr.io/linuxserver/deluge
+    container_name: deluge
     restart: unless-stopped
     environment:
       - PUID=${PUID}
@@ -70,3 +82,12 @@ services:
       - 8112:8112
       - 6881:6881
       - 6881:6881/udp
+      
+  flaresolver:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    ports:
+      - "8191:8191"
+    environment:
+      - LOG_LEVEL=info

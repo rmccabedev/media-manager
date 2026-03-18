@@ -1,2 +1,6 @@
 Indexer URL:
 http://jackett:9117/api/v2.0/indexers/thepiratebay/results/torznab/
+
+For config folders run
+chown -R <UID>:<GID> ./config/<appname>
+chmod -R 776 ./config/<appname>

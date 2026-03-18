@@ -91,3 +91,26 @@ services:
       - "8191:8191"
     environment:
       - LOG_LEVEL=info
+
+#   pihole:
+#     container_name: pihole
+#     image: pihole/pihole:latest
+#     ports:
+#       - "53:53/tcp"
+#       - "53:53/udp"
+#       - "8080:80/tcp"
+#       - "8443:443/tcp"
+#       - "67:67/udp"
+#     environment:
+#       TZ: 'Europe/Dublin'
+#       FTLCONF_webserver_api_password: '${PI_PW}'  # Set via .env file
+#       FTLCONF_dns_listeningMode: 'ALL'
+#       PIHOLE_UID: ${PUID}
+#       PIHOLE_GID: ${PGID}
+#     volumes:
+#       - './config/pihole:/etc/pihole'
+#     cap_add:
+#       - NET_ADMIN
+#       - SYS_TIME
+#       - SYS_NICE
+#     restart: unless-stopped
